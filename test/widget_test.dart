@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tadbiro/core/app.dart';
 
 import 'package:tadbiro/main.dart';
 
