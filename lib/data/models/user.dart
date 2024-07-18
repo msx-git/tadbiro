@@ -6,6 +6,7 @@ class User {
   String profession;
   String email;
   String token;
+  String refreshToken;
   DateTime expiresIn;
 
   User({
@@ -16,6 +17,7 @@ class User {
     required this.profession,
     required this.email,
     required this.token,
+    required this.refreshToken,
     required this.expiresIn,
   });
 
@@ -28,6 +30,7 @@ class User {
       'profession': profession,
       'email': email,
       'idToken': token,
+      'refreshToken': refreshToken,
       'expiresIn': expiresIn.toString(),
     };
   }
@@ -41,6 +44,7 @@ class User {
       profession: json['profession'] as String? ?? '',
       email: json['email'] as String? ?? '',
       token: json['idToken'] as String? ?? '',
+      refreshToken: json['refreshToken'] as String? ?? '',
       expiresIn: DateTime.now().add(
         Duration(
           seconds: int.parse(

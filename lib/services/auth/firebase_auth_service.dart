@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,10 +29,11 @@ class FirebaseAuthService {
           },
         ),
       );
-
+      debugPrint("response: ${response.body}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final user = User.fromJson(data);
+        debugPrint("USER: $user");
         _saveUserData(user);
         return user;
       }
@@ -77,6 +79,7 @@ class FirebaseAuthService {
         imageUrl: '',
         profession: '',
         token: user['idToken'],
+        refreshToken: user['refreshToken'],
         expiresIn: DateTime.parse(
           user['expiresIn'],
         ),

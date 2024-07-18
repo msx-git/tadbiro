@@ -1,13 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tadbiro/ui/screen/auth/register_screen.dart';
 import 'package:tadbiro/utils/extensions/sizedbox_extension.dart';
 
 import '../../../logic/blocs/auth/auth_bloc.dart';
 import '../../../utils/constants/assets.dart';
 import '../../../utils/exports/navigation.dart';
 import '../../widgets/my_text_form_field.dart';
+import '../../widgets/show_loader.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,11 +27,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void submit() async {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-            LoginEvent(
-              email: _emailController.text.trim(),
-              password: _passwordController.text.trim(),
-            ),
-          );
+        LoginEvent(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -81,10 +84,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _emailController,
                 isEmail: true,
                 validator: (p0) {
-                  if (p0 == null || p0.trim().isEmpty) {
+                  if (p0 == null || p0
+                      .trim()
+                      .isEmpty) {
                     return "Please, enter email!";
                   } else if (!RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
                       .hasMatch(p0.trim())) {
                     return "Please, enter a valid email!";
                   }
@@ -114,7 +119,11 @@ class _LoginScreenState extends State<LoginScreen> {
               12.height,
               ElevatedButton(
                 onPressed: () {
-                  navigationService.navigateTo(AppRoute.register);
+                  Navigator.push(context, CupertinoPageRoute(
+                    builder: (context) {
+                      return const RegisterScreen();
+                    },
+                  ));
                 },
                 child: const Text("Ro'yxatdan O'tish"),
               ),

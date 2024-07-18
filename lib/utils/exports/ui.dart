@@ -1,6 +1,13 @@
 export '../../ui/screen/auth/login_screen.dart';
 export '../../ui/screen/auth/register_screen.dart';
+export '../../ui/screen/auth/reset_password_screen.dart';
+export '../../ui/screen/change_language/change_language_screen.dart';
+export '../../ui/screen/change_mode/change_mode_screen.dart';
 export '../../ui/screen/home/home_screen.dart';
+export '../../ui/screen/my_events/add_event/add_event_screen.dart';
+export '../../ui/screen/my_events/my_events_screen.dart';
+export '../../ui/screen/notifications/notifications_screen.dart';
+export '../../ui/screen/profile_info/profile_info_screen.dart';
 export '../../ui/screen/splash/splash_screen.dart';
 export '../../ui/widgets/my_text_form_field.dart';
 export '../../ui/widgets/show_loader.dart';

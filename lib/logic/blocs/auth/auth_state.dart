@@ -29,3 +29,17 @@ final class SendingResetFailState extends AuthState {
 
   SendingResetFailState(this.message);
 }
+
+// final class RegisterLoadingState extends AuthState {}
+//
+// final class RegisterSuccessState extends AuthState {
+//   final User user;
+//
+//   RegisterSuccessState(this.user);
+// }
+//
+// final class RegisterFailState extends AuthState {
+//   final String message;
+//
+//   RegisterFailState(this.message);
+// }

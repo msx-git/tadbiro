@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../data/models/user.dart';
 import '../../../data/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
+
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -26,10 +28,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.email,
         event.password,
       );
-      print(user);
       emit(AuthenticatedAuthState(user));
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       emit(ErrorAuthState(e.toString()));
     }
   }

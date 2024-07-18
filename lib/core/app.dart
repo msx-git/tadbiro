@@ -14,24 +14,29 @@ class MyApp extends StatelessWidget {
     // print("My APP -----------------------------------");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BlocConsumer<AuthBloc, AuthState>(
+      home: BlocBuilder<AuthBloc, AuthState>(
         bloc: context.read<AuthBloc>()..add(CheckTokenExpiryEvent()),
-        listener: (context, state) {
-          // print("CONSUMER LISTENER ---------------------");
-          if (state is LoadingAuthState) {
-            Messages.showLoadingDialog(context);
-          }
-          if (state is ErrorAuthState ||
-              state is AuthenticatedAuthState) {
-            Navigator.of(context).pop();
-          }
-        },
         builder: (context, state) {
-          print("CONSUMER BUILDER ---------------------");
           if (state is AuthenticatedAuthState) {
             return const HomeScreen();
           }
           return const LoginScreen();
+          return BlocConsumer<AuthBloc, AuthState>(
+            bloc: context.read<AuthBloc>()..add(CheckTokenExpiryEvent()),
+            listener: (context, state) {
+              if (state is LoadingAuthState) {
+                Messages.showLoadingDialog(context);
+              } else if (state is! LoadingAuthState) {
+                Navigator.of(context).pop();
+              }
+            },
+            builder: (context, state) {
+              if (state is AuthenticatedAuthState) {
+                return const HomeScreen();
+              }
+              return const LoginScreen();
+            },
+          );
         },
       ),
       routes: AppRoute.routes,
