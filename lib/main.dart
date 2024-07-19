@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:tadbiro/data/repositories/event_repository.dart';
 import 'package:tadbiro/logic/blocs/event/event_bloc.dart';
 import 'package:tadbiro/services/auth/firebase_event_service.dart';
+import 'package:tadbiro/services/local_notification_service.dart';
 
 import '../data/repositories/auth_repository.dart';
 import '../logic/blocs/auth/auth_bloc.dart';
@@ -20,7 +21,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await LocalNotificationService.start();
   await dotenv.load(fileName: '.env');
 
   /// PERMISSIONS

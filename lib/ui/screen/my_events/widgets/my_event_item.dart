@@ -1,13 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:tadbiro/ui/widgets/favorite_button.dart';
+import 'package:tadbiro/ui/screen/my_events/widgets/edit_event_screen.dart';
 import 'package:tadbiro/utils/extensions/sizedbox_extension.dart';
 
 import '../../../../data/models/event.dart';
+import '../../../../utils/exports/logics.dart';
 
-class EventItem extends StatelessWidget {
-  const EventItem({super.key, required this.event});
+class MyEventItem extends StatelessWidget {
+  const MyEventItem({super.key, required this.event});
 
   final Event event;
 
@@ -16,19 +19,23 @@ class EventItem extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          height: 130,
+          height: 120,
           width: double.infinity,
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
+            color: Colors.white,
             border: Border.all(color: Colors.grey, width: 1),
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(color: Colors.grey.shade300, blurRadius: 5),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                height: 120,
+                height: 100,
                 width: 100,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -41,10 +48,17 @@ class EventItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    event.title,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        event.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,9 +82,32 @@ class EventItem extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: 10,
+          top: 0,
           right: 0,
-          child: FavoriteButton(event: event),
+          child: PopupMenuButton(
+            offset: const Offset(-30, 30),
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  onTap: () => Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => EditEventScreen(event: event),
+                    ),
+                  ),
+                  child: const Text('Tahrirlash'),
+                ),
+                PopupMenuItem(
+                  onTap: () {
+                    context
+                        .read<EventBloc>()
+                        .add(DeleteEventEvent(id: event.id));
+                  },
+                  child: const Text("O'chirish"),
+                ),
+              ];
+            },
+          ),
         )
       ],
     );

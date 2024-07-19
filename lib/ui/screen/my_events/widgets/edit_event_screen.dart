@@ -9,17 +9,20 @@ import 'package:tadbiro/utils/exports/logics.dart';
 import 'package:tadbiro/utils/exports/navigation.dart';
 import 'package:tadbiro/utils/extensions/sizedbox_extension.dart';
 
+import '../../../../data/models/event.dart';
 import '../../../../utils/exports/ui.dart';
-import 'place_picker_map.dart';
+import '../add_event/place_picker_map.dart';
 
-class AddEventScreen extends StatefulWidget {
-  const AddEventScreen({super.key});
+class EditEventScreen extends StatefulWidget {
+  const EditEventScreen({super.key, this.event});
+
+  final Event? event;
 
   @override
-  State<AddEventScreen> createState() => _AddEventScreenState();
+  State<EditEventScreen> createState() => _EditEventScreenState();
 }
 
-class _AddEventScreenState extends State<AddEventScreen> {
+class _EditEventScreenState extends State<EditEventScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _titleController = TextEditingController();
@@ -65,6 +68,25 @@ class _AddEventScreenState extends State<AddEventScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(
+      Duration.zero,
+      () {
+        _titleController.text = widget.event!.title;
+        _descriptionController.text = widget.event!.description;
+        _dateController.text =
+            DateFormat('EEEE, d-MMMM, yyyy').format(widget.event!.date);
+        _timeController.text = DateFormat('HH:mm').format(widget.event!.date);
+        _placeInfo = widget.event!.placeInfo;
+        latitude = widget.event!.latitude;
+        longitude = widget.event!.longitude;
+        setState(() {});
+      },
+    );
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
@@ -75,6 +97,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // final event = ModalRoute.of(context)!.settings.arguments;
+
     return BlocListener<EventBloc, EventStates>(
       listener: (context, state) {
         if (state is LoadingEventsState) {
@@ -85,7 +109,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Tadbir qo'shish")),
+        appBar: AppBar(title: const Text("Tadbirni tahrirlash")),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -316,21 +340,22 @@ class _AddEventScreenState extends State<AddEventScreen> {
             if (_formKey.currentState!.validate() &&
                 (latitude != null || longitude != null)) {
               context.read<EventBloc>().add(
-                    AddEventEvent(
-                      title: _titleController.text.trim(),
-                      description: _descriptionController.text.trim(),
-                      placeInfo: _placeInfo,
-                      date: DateTime(
+                    EditEventEvent(
+                      id: widget.event!.id,
+                      newTitle: _titleController.text.trim(),
+                      newDescription: _descriptionController.text.trim(),
+                      newPlaceInfo: _placeInfo,
+                      newDate: DateTime(
                         _dateTime.year,
                         _dateTime.month,
                         _dateTime.day,
                         _timeOfDay.hour,
                         _timeOfDay.minute,
                       ),
-                      latitude: latitude!,
-                      longitude: longitude!,
-                      imageFile: imageFile!,
-                      isLiked: false,
+                      newLatitude: latitude!,
+                      newLongitude: longitude!,
+                      newImageFile: imageFile!,
+                      imageUrl: widget.event!.bannerImageUrl,
                     ),
                   );
               _titleController.clear();
@@ -340,7 +365,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
               _timeController.clear();
             }
           },
-          label: const Text("Qo'shish"),
+          label: const Text("Tahrirlash"),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

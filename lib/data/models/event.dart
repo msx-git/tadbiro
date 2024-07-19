@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-
 class Event {
   final String id;
+  final String organizerId;
+  final String participantId;
   String title;
   String description;
   String placeInfo;
@@ -13,6 +13,8 @@ class Event {
 
   Event({
     required this.id,
+    required this.organizerId,
+    this.participantId = '',
     required this.title,
     required this.description,
     required this.placeInfo,
@@ -25,6 +27,6 @@ class Event {
 
   @override
   String toString() {
-    return 'Event{id: $id, title: $title, description: $description, placeInfo: $placeInfo, date: $date, latitude: $latitude, longitude: $longitude, bannerImageUrl: $bannerImageUrl, isLiked: $isLiked}';
+    return 'Event{id: $id, organizerId:$organizerId, participantId: $participantId, title: $title, description: $description, placeInfo: $placeInfo, date: $date, latitude: $latitude, longitude: $longitude, bannerImageUrl: $bannerImageUrl, isLiked: $isLiked}';
   }
 }

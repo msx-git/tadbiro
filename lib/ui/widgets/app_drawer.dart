@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:tadbiro/utils/exports/navigation.dart';
 
+import '../../data/models/user.dart';
+
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  const AppDrawer({super.key, required this.user});
+
+  final User user;
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Column(
         children: [
-          const SafeArea(
+          SafeArea(
             child: ListTile(
-              leading: CircleAvatar(),
-              title: Text("Ism Familya"),
-              subtitle: Text("e-pochta@gmail.com"),
+              leading: const CircleAvatar(),
+              title: Text("${user.firstName} ${user.lastName}"),
+              subtitle: Text(user.email),
             ),
           ),
           const Divider(),
@@ -21,7 +25,8 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.event),
             title: const Text("Mening tadbirlarim"),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => navigationService.navigateTo(AppRoute.myEvents),
+            onTap: () => navigationService.navigateTo(AppRoute.myEvents,
+                arguments: user.id),
           ),
           ListTile(
             leading: const Icon(Icons.person),

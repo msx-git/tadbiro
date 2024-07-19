@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:tadbiro/services/auth/firebase_event_service.dart';
 
 import '../models/event.dart';
@@ -24,7 +23,6 @@ class EventRepository {
     required DateTime date,
     required double latitude,
     required double longitude,
-    required String bannerImageUrl,
     required File imageFile,
     required bool isLiked,
   }) async {
@@ -35,9 +33,33 @@ class EventRepository {
       date: date,
       latitude: latitude,
       longitude: longitude,
-      bannerImageUrl: bannerImageUrl,
       imageFile: imageFile,
       isLiked: isLiked,
+    );
+  }
+
+  /// EDIT THE EVENT
+  Future<void> editEvent({
+    required String id,
+    required String newTitle,
+    required String newDescription,
+    required String newPlaceInfo,
+    required DateTime newDate,
+    required double newLatitude,
+    required double newLongitude,
+    required String imageUrl,
+    required File? newImageFile,
+  }) async {
+    await _firebaseEventService.editEvent(
+      id: id,
+      newTitle: newTitle,
+      newDescription: newDescription,
+      newPlaceInfo: newPlaceInfo,
+      newDate: newDate,
+      newLatitude: newLatitude,
+      newLongitude: newLongitude,
+      imageUrl: imageUrl,
+      newImageFile: newImageFile,
     );
   }
 

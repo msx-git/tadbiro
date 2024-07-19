@@ -38,6 +38,7 @@ class FirebaseEventService {
             events.add(
               Event(
                 id: key,
+                organizerId: value['organizerId'],
                 title: value['title'],
                 description: value['description'],
                 placeInfo: value['placeInfo'],
@@ -65,45 +66,20 @@ class FirebaseEventService {
     required DateTime date,
     required double latitude,
     required double longitude,
-    required String bannerImageUrl,
     required File imageFile,
     required bool isLiked,
   }) async {
-    final imageRef = _eventImageStorage
-        .ref()
-        .child('eventImages')
-        .child("${DateTime.now().microsecondsSinceEpoch}.jpg");
-    final uploadTask = imageRef.putFile(imageFile);
-
-    /// LISTENING TO UPLOAD PROGRESS
-    uploadTask.snapshotEvents.listen(
-      (status) {
-        debugPrint("Uploading status: ${status.state}");
-        double percentage =
-            (status.bytesTransferred / imageFile.lengthSync()) * 100;
-        debugPrint("Uploading percentage: $percentage");
-      },
-    );
-
-    late String? imageUrl;
-
-    await uploadTask.whenComplete(
-      () async {
-        imageUrl = await imageRef.getDownloadURL();
-      },
-    );
-
-    if (imageUrl == null) {
-      throw ("Couldn't get imageUrl.");
-    }
+    String imageUrl = await _uploadEventImage(imageFile);
 
     final userToken = await _getUserToken();
+    final userId = await _getUserId();
     Uri url = Uri.parse("$_baseUrl/events.json?auth=$userToken");
 
     try {
       final response = await http.post(
         url,
         body: jsonEncode({
+          'organizerId': userId,
           'title': title,
           'description': description,
           'placeInfo': placeInfo,
@@ -126,17 +102,63 @@ class FirebaseEventService {
 
       final addedEvent = Event(
         id: data['name'],
+        organizerId: userId,
         title: title,
         description: description,
         placeInfo: placeInfo,
         date: date,
         latitude: latitude,
         longitude: longitude,
-        bannerImageUrl: imageUrl!,
+        bannerImageUrl: imageUrl,
         isLiked: isLiked,
       );
 
       return addedEvent;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// EDIT THE EVENT
+  Future<void> editEvent({
+    required String id,
+    required String newTitle,
+    required String newDescription,
+    required String newPlaceInfo,
+    required DateTime newDate,
+    required double newLatitude,
+    required double newLongitude,
+    required String imageUrl,
+    required File? newImageFile,
+  }) async {
+    if (newImageFile != null) {
+      //await _eventImageStorage.refFromURL(imageUrl).delete();
+      imageUrl = await _uploadEventImage(newImageFile);
+    }
+
+    final userToken = await _getUserToken();
+    Uri url = Uri.parse("$_baseUrl/events/$id.json?auth=$userToken");
+
+    try {
+      final response = await http.patch(
+        url,
+        body: {
+          'title': newTitle,
+          'description': newDescription,
+          'placeInfo': newPlaceInfo,
+          'date': newDate.toString(),
+          'latitude': newLatitude,
+          'longitude': newLongitude,
+          'bannerImageUrl': imageUrl,
+        },
+      );
+      print("RESPONSE: ${response.body}");
+      print("RESPONSE: ${response.statusCode}");
+      if (response.statusCode != 200) {
+        final errorData = jsonDecode(response.body);
+        print("ERROR DATA: $errorData");
+        throw (errorData['error']);
+      }
     } catch (e) {
       rethrow;
     }
@@ -148,7 +170,6 @@ class FirebaseEventService {
     Uri url = Uri.parse("$_baseUrl/events/$id.json?auth=$userToken");
     try {
       final response = await http.delete(url);
-
       if (response.statusCode != 200) {
         final errorData = jsonDecode(response.body);
         throw (errorData['error']);
@@ -182,6 +203,21 @@ class FirebaseEventService {
     }
 
     return user['idToken'];
+  }
+
+  /// GET USER ID
+  Future<String> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final userData = prefs.getString("userData");
+      if (userData == null) {
+        throw ("Error getting userData");
+      }
+      Map<String, dynamic> user = jsonDecode(userData);
+      return user['localId'];
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// GET NEW TOKEN with REFRESH TOKEN
@@ -222,5 +258,30 @@ class FirebaseEventService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// UPLOAD IMAGE TO THE FIREBASE STORAGE AND GET DOWNLOAD URL
+  Future<String> _uploadEventImage(
+    File imageFile,
+  ) async {
+    final imageRef = _eventImageStorage
+        .ref()
+        .child('eventImages')
+        .child("${DateTime.now().microsecondsSinceEpoch}.jpg");
+
+    final uploadTask = imageRef.putFile(imageFile);
+
+    /// LISTENING TO UPLOAD PROGRESS
+    uploadTask.snapshotEvents.listen(
+      (status) {
+        debugPrint("Uploading status: ${status.state}");
+        double percentage =
+            (status.bytesTransferred / imageFile.lengthSync()) * 100;
+        debugPrint("Uploading percentage: $percentage");
+      },
+    );
+
+    await uploadTask.whenComplete(() {});
+    return imageRef.getDownloadURL();
   }
 }
